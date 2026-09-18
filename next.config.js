@@ -35,8 +35,10 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
   compress: true,
-  outputFileTracingIncludes: {
-    '/**': ['./prisma/dev.db'],
+  experimental: {
+    outputFileTracingIncludes: {
+      '/**': ['./prisma/dev.db'],
+    },
   },
   images: {
     formats: ['image/avif', 'image/webp'],
