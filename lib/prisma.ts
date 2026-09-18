@@ -4,6 +4,8 @@ import path from 'path';
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
+import os from 'os';
+
 function setupPrismaUrl(): string | undefined {
   const envUrl = process.env.DATABASE_URL;
   if (envUrl && !envUrl.startsWith('file:')) {
@@ -12,10 +14,10 @@ function setupPrismaUrl(): string | undefined {
 
   // En environnement Vercel / Serverless, /var/task est en lecture seule.
   // SQLite nécessite un accès en écriture pour les verrous et les journaux WAL.
-  // On copie donc la base dev.db vers /tmp/dev.db.
   if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
     try {
-      const tmpDbPath = path.join('/tmp', 'dev.db');
+      const tmpDir = process.env.VERCEL ? '/tmp' : os.tmpdir();
+      const tmpDbPath = path.join(tmpDir, 'dev.db');
       const candidateSources = [
         path.join(process.cwd(), 'prisma', 'dev.db'),
         path.join(__dirname, '..', '..', 'prisma', 'dev.db'),
@@ -30,6 +32,7 @@ function setupPrismaUrl(): string | undefined {
 
       if (!tmpExists || tmpSize === 0) {
         if (sourceDbPath) {
+          fs.mkdirSync(path.dirname(tmpDbPath), { recursive: true });
           fs.copyFileSync(sourceDbPath, tmpDbPath);
         }
       }
@@ -37,7 +40,7 @@ function setupPrismaUrl(): string | undefined {
         return `file:${tmpDbPath}`;
       }
     } catch (e) {
-      console.error('Failed to setup serverless SQLite in /tmp:', e);
+      console.error('Failed to setup serverless SQLite in tmp:', e);
     }
   }
 
