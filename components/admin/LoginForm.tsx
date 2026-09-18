@@ -18,164 +18,86 @@ import Alerte from './Alerte';
  */
 export default function LoginForm() {
   const router = useRouter();
-  const [etat, action] = useFormState<EtatLogin, FormData>(verifierIdentifiants, {
-    etape: 'identifiants',
-  });
-
-  const identifiants = useRef<{ email: string; password: string }>({ email: '', password: '' });
-  const [erreur2fa, setErreur2fa] = useState('');
+  const [erreur, setErreur] = useState('');
   const [enCours, setEnCours] = useState(false);
 
-  const etape = etat.etape ?? 'identifiants';
-
-  async function ouvrirSession(code: string = '') {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     setEnCours(true);
-    setErreur2fa('');
+    setErreur('');
 
-    const res = await signIn('credentials', {
-      email: identifiants.current.email,
-      password: identifiants.current.password,
-      token: code,
-      redirect: false,
-    });
+    const formData = new FormData(e.currentTarget);
+    const email = String(formData.get('email') ?? '').trim().toLowerCase();
+    const password = String(formData.get('password') ?? '');
 
-    setEnCours(false);
+    try {
+      const res = await signIn('credentials', {
+        email,
+        password,
+        token: '',
+        redirect: false,
+      });
 
-    if (res?.ok) {
-      identifiants.current = { email: '', password: '' };
-      router.push(etape === 'configuration' ? '/admin/setup-2fa' : '/admin/dashboard');
-      router.refresh();
-      return;
+      setEnCours(false);
+
+      if (res?.ok) {
+        router.push('/admin/dashboard');
+        router.refresh();
+        return;
+      }
+
+      setErreur('E-mail ou mot de passe incorrect.');
+    } catch (err) {
+      setEnCours(false);
+      setErreur('Erreur de connexion. Veuillez réessayer.');
     }
-    setErreur2fa('Code refusé. Vérifiez l’heure de votre téléphone et réessayez.');
   }
 
   return (
     <div className="w-full max-w-sm rounded-lg bg-white p-6 shadow-carte ring-1 ring-nuit/5">
-      {etape === 'identifiants' && (
-        <>
-          <h1 className="text-2xl">Espace agence</h1>
-          <p className="mt-2 text-sm text-ardoise/75">
-            Réservé aux agents de Humo Kolwezi. Connectez-vous avec vos identifiants.
-          </p>
+      <h1 className="text-2xl">Espace agence</h1>
+      <p className="mt-2 text-sm text-ardoise/75">
+        Réservé à l’administration d’Humo Kolwezi. Connectez-vous avec vos identifiants.
+      </p>
 
-          <form
-            action={(formData) => {
-              identifiants.current = {
-                email: String(formData.get('email') ?? '').trim().toLowerCase(),
-                password: String(formData.get('password') ?? ''),
-              };
-              action(formData);
-            }}
-            className="mt-6 space-y-4"
-          >
-            <Alerte etat={{ erreur: etat.erreur }} />
+      <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <Alerte etat={{ erreur }} />
 
-            <div>
-              <label htmlFor="email" className="etiquette">E-mail</label>
-              <input id="email" name="email" type="email" required autoComplete="username" className="champ" />
-            </div>
+        <div>
+          <label htmlFor="email" className="etiquette">E-mail</label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autoComplete="username"
+            placeholder="admin@humokolwezi.cd"
+            className="champ"
+          />
+        </div>
 
-            <div>
-              <label htmlFor="password" className="etiquette">Mot de passe</label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                minLength={8}
-                autoComplete="current-password"
-                className="champ"
-              />
-            </div>
+        <div>
+          <label htmlFor="password" className="etiquette">Mot de passe</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="current-password"
+            className="champ"
+          />
+        </div>
 
-            <SubmitButton variante="nuit" enCours="Vérification en cours...">Continuer</SubmitButton>
-          </form>
-        </>
-      )}
-
-      {etape === 'configuration' && (
-        <>
-          <ShieldCheck className="h-10 w-10 text-cuivre" aria-hidden="true" />
-          <h1 className="mt-4 text-2xl">Configuration 2FA requise</h1>
-          <p className="mt-2 text-sm text-ardoise/75">
-            Vos identifiants sont corrects. Cliquez sur le bouton ci-dessous pour configurer la double authentification par QR Code.
-          </p>
-
-          <div className="mt-6 space-y-4">
-            <Alerte etat={{ erreur: erreur2fa }} />
-
-            <button
-              type="button"
-              disabled={enCours}
-              onClick={() => void ouvrirSession('')}
-              className="btn-or w-full disabled:opacity-60 py-3"
-            >
-              <KeyRound className="h-5 w-5" aria-hidden="true" />
-              {enCours ? 'Vérification...' : 'Continuer vers le QR Code 2FA'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-nuit-600 hover:underline"
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Recommencer
-            </button>
-          </div>
-        </>
-      )}
-
-      {etape === 'deux-facteurs' && (
-        <>
-          <ShieldCheck className="h-10 w-10 text-cuivre" aria-hidden="true" />
-          <h1 className="mt-4 text-2xl">Code de vérification</h1>
-          <p className="mt-2 text-sm text-ardoise/75">
-            Ouvrez votre application d’authentification (Google Authenticator, Aegis) et entrez le code à six chiffres.
-          </p>
-
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const data = new FormData(e.currentTarget);
-              void ouvrirSession(String(data.get('token') ?? ''));
-            }}
-            className="mt-6 space-y-4"
-          >
-            <Alerte etat={{ erreur: erreur2fa }} />
-
-            <div>
-              <label htmlFor="token" className="etiquette">Code à 6 chiffres</label>
-              <input
-                id="token"
-                name="token"
-                type="text"
-                inputMode="numeric"
-                autoComplete="one-time-code"
-                required
-                placeholder="123456"
-                className="champ tracking-[0.3em]"
-                autoFocus
-              />
-            </div>
-
-            <button type="submit" disabled={enCours} className="btn-or w-full disabled:opacity-60">
-              <KeyRound className="h-5 w-5" aria-hidden="true" />
-              {enCours ? 'Vérification...' : 'Ouvrir la session'}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-nuit-600 hover:underline"
-            >
-              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-              Recommencer
-            </button>
-          </form>
-        </>
-      )}
+        <button
+          type="submit"
+          disabled={enCours}
+          className="btn-nuit w-full flex items-center justify-center gap-2 py-3 disabled:opacity-60 font-semibold"
+        >
+          <ShieldCheck className="h-5 w-5" aria-hidden="true" />
+          {enCours ? 'Connexion en cours...' : 'Se connecter'}
+        </button>
+      </form>
     </div>
   );
 }

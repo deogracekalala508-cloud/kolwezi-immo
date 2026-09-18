@@ -76,13 +76,15 @@ export const authOptions: NextAuthOptions = {
         // "configuration requise". Le layout admin ne laisse alors acceder
         // qu'a /admin/setup-2fa.
         if (!user.twoFactorEnabled || !user.twoFactorSecret) {
-          journal.info('Connexion sans 2FA : configuration exigee', { userId: user.id });
+          journal.info('Connexion sans 2FA', { userId: user.id });
+          await prisma.user.update({ where: { id: user.id }, data: { lastLoginAt: new Date() } });
+          loginLimiter.reset(`auth:${email}`);
           return {
             id: user.id,
             email: user.email,
             name: user.name,
             role: user.role,
-            twoFactorPending: true,
+            twoFactorPending: false,
           };
         }
 
