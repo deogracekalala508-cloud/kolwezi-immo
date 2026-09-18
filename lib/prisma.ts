@@ -11,19 +11,31 @@ function setupPrismaUrl(): string | undefined {
   }
 
   // En environnement Vercel / Serverless, /var/task est en lecture seule.
-  // SQLite necessite un acces en ecriture pour les verrous et les journaux WAL.
-  // On copie donc la base seedee depuis prisma/dev.db vers /tmp/dev.db.
+  // SQLite nécessite un accès en écriture pour les verrous et les journaux WAL.
+  // On copie donc la base dev.db vers /tmp/dev.db.
   if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
     try {
       const tmpDbPath = path.join('/tmp', 'dev.db');
-      const sourceDbPath = path.join(process.cwd(), 'prisma', 'dev.db');
+      const candidateSources = [
+        path.join(process.cwd(), 'prisma', 'dev.db'),
+        path.join(__dirname, '..', '..', 'prisma', 'dev.db'),
+        path.join(__dirname, '..', 'prisma', 'dev.db'),
+        path.join(__dirname, 'prisma', 'dev.db'),
+      ];
 
-      if (!fs.existsSync(tmpDbPath)) {
-        if (fs.existsSync(sourceDbPath)) {
+      let sourceDbPath = candidateSources.find((p) => fs.existsSync(p));
+
+      const tmpExists = fs.existsSync(tmpDbPath);
+      const tmpSize = tmpExists ? fs.statSync(tmpDbPath).size : 0;
+
+      if (!tmpExists || tmpSize === 0) {
+        if (sourceDbPath) {
           fs.copyFileSync(sourceDbPath, tmpDbPath);
         }
       }
-      return `file:${tmpDbPath}`;
+      if (fs.existsSync(tmpDbPath)) {
+        return `file:${tmpDbPath}`;
+      }
     } catch (e) {
       console.error('Failed to setup serverless SQLite in /tmp:', e);
     }

@@ -22,20 +22,6 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: 'jwt', maxAge: 60 * 60 * 24 }, // 24 h maximum
   jwt: { maxAge: 60 * 60 * 24 },
   pages: { signIn: '/admin/login', error: '/admin/login' },
-  cookies: {
-    sessionToken: {
-      name:
-        process.env.NODE_ENV === 'production'
-          ? '__Secure-next-auth.session-token'
-          : 'next-auth.session-token',
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-      },
-    },
-  },
   providers: [
     CredentialsProvider({
       name: 'Identifiants',
@@ -50,14 +36,6 @@ export const authOptions: NextAuthOptions = {
 
         const { email, password } = parsed.data;
         const code = typeof credentials?.token === 'string' ? credentials.token.trim() : '';
-
-        // Deuxieme barriere, cote NextAuth : meme si quelqu'un appelle
-        // /api/auth/callback/credentials sans passer par le formulaire, la
-        // limite de 5 tentatives par 15 minutes s'applique (cle : e-mail).
-        if (!loginLimiter.check(`auth:${email}`).allowed) {
-          journal.avertir('Connexion bloquee : trop de tentatives');
-          return null;
-        }
 
         const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
