@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-sable text-ardoise antialiased;
+    font-size: 17px; /* lisible sur petits ecrans bon marche */
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display font-semibold tracking-tight text-nuit;
+    line-height: 1.15;
+    text-wrap: balance;
+  }
+
+  /* Focus clavier toujours visible, y compris sur fond sombre */
+  :focus-visible {
+    outline: 3px solid theme('colors.or.DEFAULT');
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .conteneur {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+  .bloc {
+    @apply py-14 sm:py-20;
+  }
+
+  .lien-saut {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50
+      focus:rounded focus:bg-or focus:px-4 focus:py-2 focus:font-semibold focus:text-nuit;
+  }
+
+  .btn-or {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-or px-5 py-3
+      font-semibold text-nuit transition-colors hover:bg-or-300 active:bg-or-300;
+  }
+
+  .btn-nuit {
+    @apply inline-flex items-center justify-center gap-2 rounded-md bg-nuit px-5 py-3
+      font-semibold text-white transition-colors hover:bg-nuit-700;
+  }
+
+  .btn-contour {
+    @apply inline-flex items-center justify-center gap-2 rounded-md border border-nuit/25
+      bg-white px-5 py-3 font-semibold text-nuit transition-colors hover:border-nuit/50;
+  }
+
+  .champ {
+    @apply w-full rounded-md border border-nuit/20 bg-white px-3 py-3 text-base
+      text-ardoise placeholder:text-ardoise/40 focus:border-nuit-600;
+  }
+
+  .etiquette {
+    @apply mb-1.5 block font-medium text-nuit;
+  }
+
+  .erreur {
+    @apply mt-1.5 text-sm font-medium text-red-700;
+  }
+
+  /* Filet cuivre : rappel du minerai, utilise pour separer les grandes sections */
+  .filet-cuivre {
+    @apply h-px w-full bg-gradient-to-r from-cuivre/0 via-cuivre/60 to-cuivre/0;
+  }
+}

@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-label="Photo indisponible">
+  <rect width="800" height="600" fill="#EDF2F8"/>
+  <path d="M250 360 400 230l150 130v20h-40v100H290V380h-40z" fill="#0A2342" opacity=".18"/>
+  <text x="400" y="520" text-anchor="middle" font-family="system-ui, sans-serif" font-size="26" fill="#0A2342" opacity=".55">Photo a venir</text>
+</svg>

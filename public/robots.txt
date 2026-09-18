@@ -1,0 +1,16 @@
+# robots.txt - Humo Kolwezi
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /merci
+
+# Les robots d entrainement de modeles ne sont pas les bienvenus.
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+Sitemap: https://www.humokolwezi.cd/sitemap.xml

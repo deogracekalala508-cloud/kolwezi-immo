@@ -1,0 +1,126 @@
+// Base SQLite en developpement.
+// NOTE IMPORTANTE : SQLite ne supporte ni les enums Prisma ni les listes de
+// scalaires (String[]). Deux adaptations ont donc ete faites :
+//   - category / status / role : String, contraints par Zod (lib/validations.ts)
+//   - images : String contenant un tableau JSON, lu via lib/images.ts
+// Si vous passez en PostgreSQL, remplacez provider par "postgresql" puis
+// convertissez ces champs en enum / String[] (voir README).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Property {
+  id          String   @id @default(cuid())
+  ownerId     String // agent proprietaire de la fiche : barriere anti-IDOR
+  title       String
+  slug        String   @unique
+  description String
+  category    String // MAISON | PARCELLE | VEHICULE
+  price       Int // en cents pour eviter les arrondis flottants
+  currency    String   @default("USD")
+  location    String
+  images      String   @default("[]") // tableau JSON d'objets { url, alt }
+  status      String   @default("DISPONIBLE") // DISPONIBLE | VENDU | RESERVE
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  messages ContactMessage[]
+  owner    User             @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId])
+  @@index([category, status])
+  @@index([featured])
+}
+
+model ContactMessage {
+  id         String   @id @default(cuid())
+  name       String
+  phone      String
+  email      String?
+  message    String
+  propertyId String?
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+
+  @@index([isRead, createdAt])
+}
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  clientName String
+  content    String
+  rating     Int // 1 a 5, valide par Zod
+  published  Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model FaqItem {
+  id       String @id @default(cuid())
+  question String
+  answer   String
+  order    Int    @default(0)
+
+  @@index([order])
+}
+
+model TeamMember {
+  id    String  @id @default(cuid())
+  name  String
+  role  String
+  photo String
+  bio   String
+  order Int     @default(0)
+  phone String?
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("ADMIN") // ADMIN | PROPRIETAIRE (super-admin)
+  createdAt    DateTime @default(now())
+
+  // Double authentification TOTP. Le secret n'est jamais expose au client
+  // apres l'etape de configuration.
+  twoFactorSecret  String?
+  twoFactorEnabled Boolean  @default(false)
+  backupCodes      String   @default("[]") // hachages bcrypt, tableau JSON
+  lastLoginAt      DateTime?
+
+  properties  Property[]
+  caseStudies CaseStudy[]
+}
+
+model CaseStudy {
+  id        String   @id @default(cuid())
+  ownerId   String
+  slug      String   @unique
+  title     String
+  client    String // "Famille K." : jamais de nom complet sans accord ecrit
+  category  String // MAISON | PARCELLE | VEHICULE
+  location  String
+  challenge String
+  approach  String
+  result    String
+  metric    String // resultat chiffre mis en avant, ex. "Vendu en 21 jours"
+  image     String
+  imageAlt  String
+  published Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([published, order])
+}
