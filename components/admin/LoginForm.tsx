@@ -41,8 +41,7 @@ export default function LoginForm() {
       setEnCours(false);
 
       if (res?.ok) {
-        router.push('/admin/dashboard');
-        router.refresh();
+        window.location.href = '/admin/dashboard';
         return;
       }
 
