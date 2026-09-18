@@ -10,9 +10,9 @@ const liens = [
   { href: '/biens', label: 'Les biens' },
   { href: '/biens?categorie=MAISON', label: 'Maisons' },
   { href: '/biens?categorie=PARCELLE', label: 'Parcelles' },
-  { href: '/biens?categorie=VEHICULE', label: 'Vehicules' },
-  { href: '/etudes-de-cas', label: 'Etudes de cas' },
-  { href: '/faq', label: 'Questions frequentes' },
+  { href: '/biens?categorie=VEHICULE', label: 'Véhicules' },
+  { href: '/etudes-de-cas', label: 'Études de cas' },
+  { href: '/faq', label: 'Questions fréquentes' },
   { href: '/contact', label: 'Contact' },
 ];
 

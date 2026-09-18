@@ -28,7 +28,7 @@ export default function LoginForm() {
 
   const etape = etat.etape ?? 'identifiants';
 
-  async function ouvrirSession(code: string) {
+  async function ouvrirSession(code: string = '') {
     setEnCours(true);
     setErreur2fa('');
 
@@ -47,7 +47,7 @@ export default function LoginForm() {
       router.refresh();
       return;
     }
-    setErreur2fa('Code refuse. Verifiez l heure de votre telephone et reessayez.');
+    setErreur2fa('Code refusé. Vérifiez l’heure de votre téléphone et réessayez.');
   }
 
   return (
@@ -56,7 +56,7 @@ export default function LoginForm() {
         <>
           <h1 className="text-2xl">Espace agence</h1>
           <p className="mt-2 text-sm text-ardoise/75">
-            Reserve aux agents de Humo Kolwezi. Un code a six chiffres vous sera demande ensuite.
+            Réservé aux agents de Humo Kolwezi. Connectez-vous avec vos identifiants.
           </p>
 
           <form
@@ -89,21 +89,50 @@ export default function LoginForm() {
               />
             </div>
 
-            <SubmitButton variante="nuit" enCours="Verification">Continuer</SubmitButton>
+            <SubmitButton variante="nuit" enCours="Vérification en cours...">Continuer</SubmitButton>
           </form>
         </>
       )}
 
-      {etape !== 'identifiants' && (
+      {etape === 'configuration' && (
         <>
           <ShieldCheck className="h-10 w-10 text-cuivre" aria-hidden="true" />
-          <h1 className="mt-4 text-2xl">
-            {etape === 'configuration' ? 'Double authentification a activer' : 'Code de verification'}
-          </h1>
+          <h1 className="mt-4 text-2xl">Configuration 2FA requise</h1>
           <p className="mt-2 text-sm text-ardoise/75">
-            {etape === 'configuration'
-              ? 'Votre compte n a pas encore de double authentification. Entrez le code provisoire communique par le proprietaire de l agence, ou continuez pour la configurer.'
-              : 'Ouvrez votre application d authentification et entrez le code a six chiffres. Un code de secours fonctionne aussi.'}
+            Vos identifiants sont corrects. Cliquez sur le bouton ci-dessous pour configurer la double authentification par QR Code.
+          </p>
+
+          <div className="mt-6 space-y-4">
+            <Alerte etat={{ erreur: erreur2fa }} />
+
+            <button
+              type="button"
+              disabled={enCours}
+              onClick={() => void ouvrirSession('')}
+              className="btn-or w-full disabled:opacity-60 py-3"
+            >
+              <KeyRound className="h-5 w-5" aria-hidden="true" />
+              {enCours ? 'Vérification...' : 'Continuer vers le QR Code 2FA'}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-nuit-600 hover:underline"
+            >
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              Recommencer
+            </button>
+          </div>
+        </>
+      )}
+
+      {etape === 'deux-facteurs' && (
+        <>
+          <ShieldCheck className="h-10 w-10 text-cuivre" aria-hidden="true" />
+          <h1 className="mt-4 text-2xl">Code de vérification</h1>
+          <p className="mt-2 text-sm text-ardoise/75">
+            Ouvrez votre application d’authentification (Google Authenticator, Aegis) et entrez le code à six chiffres.
           </p>
 
           <form
@@ -117,14 +146,14 @@ export default function LoginForm() {
             <Alerte etat={{ erreur: erreur2fa }} />
 
             <div>
-              <label htmlFor="token" className="etiquette">Code</label>
+              <label htmlFor="token" className="etiquette">Code à 6 chiffres</label>
               <input
                 id="token"
                 name="token"
                 type="text"
                 inputMode="numeric"
                 autoComplete="one-time-code"
-                required={etape === 'deux-facteurs'}
+                required
                 placeholder="123456"
                 className="champ tracking-[0.3em]"
                 autoFocus
@@ -133,7 +162,7 @@ export default function LoginForm() {
 
             <button type="submit" disabled={enCours} className="btn-or w-full disabled:opacity-60">
               <KeyRound className="h-5 w-5" aria-hidden="true" />
-              {enCours ? 'Verification' : 'Ouvrir la session'}
+              {enCours ? 'Vérification...' : 'Ouvrir la session'}
             </button>
 
             <button

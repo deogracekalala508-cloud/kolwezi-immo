@@ -10,9 +10,9 @@ import TeamSection from '@/components/TeamSection';
 import MapSection from '@/components/MapSection';
 
 export const metadata: Metadata = {
-  title: 'Maisons, parcelles et vehicules a vendre a Kolwezi',
+  title: 'Maisons, parcelles et véhicules à vendre à Kolwezi',
   description:
-    'Humo Kolwezi vend maisons, parcelles et vehicules a Kolwezi. Titres verifies au cadastre du Lualaba, visites accompagnees, reponse le jour meme sur WhatsApp.',
+    'Humo Kolwezi vend maisons, parcelles et véhicules à Kolwezi. Titres vérifiés au cadastre du Lualaba, visites accompagnées, réponse le jour même sur WhatsApp.',
   alternates: { canonical: '/' },
 };
 
@@ -24,21 +24,21 @@ const services = [
     icone: Home,
     titre: 'Maisons',
     texte:
-      'Villas, maisons familiales et studios meubles, du Quartier Latin au Golf. Chaque logement est visite par un agent avant publication.',
+      'Villas, maisons familiales et studios meublés, du Quartier Latin au Golf. Chaque logement est visité par un agent avant publication.',
   },
   {
     href: '/biens?categorie=PARCELLE',
     icone: LandPlot,
     titre: 'Parcelles',
     texte:
-      'Terrains residentiels, commerciaux et agricoles. Nous confirmons le certificat d enregistrement au cadastre avant de vous les proposer.',
+      'Terrains résidentiels, commerciaux et agricoles. Nous confirmons le certificat d’enregistrement au cadastre avant de vous les proposer.',
   },
   {
     href: '/biens?categorie=VEHICULE',
     icone: Car,
-    titre: 'Vehicules',
+    titre: 'Véhicules',
     texte:
-      '4x4, pick-up et berlines controles par notre atelier, avec documents de dedouanement verifies devant vous.',
+      '4x4, pick-up et berlines contrôlés par notre atelier, avec documents de dédouanement vérifiés devant vous.',
   },
 ];
 
@@ -66,20 +66,20 @@ export default async function Accueil() {
 
   return (
     <>
-      {/* HERO : le CTA principal est visible sans defilement, meme sur un ecran de 360 px */}
+      {/* HERO */}
       <section className="bg-nuit text-white">
         <div className="conteneur grid gap-8 py-12 sm:py-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-12">
           <div>
             <p className="flex items-center gap-2 text-sm font-semibold text-or-300">
               <ShieldCheck className="h-5 w-5" aria-hidden="true" />
-              Titres verifies au cadastre du Lualaba
+              Titres vérifiés au cadastre du Lualaba
             </p>
             <h1 className="mt-4 text-4xl text-white sm:text-5xl lg:text-6xl">
-              Acheter a Kolwezi sans mauvaise surprise
+              Acheter à Kolwezi sans mauvaise surprise
             </h1>
             <p className="mt-5 max-w-lisible text-lg text-white/85">
-              Maisons, parcelles et vehicules verifies avant d etre mis en vente. Un agent vous
-              accompagne de la visite jusqu a la mutation.
+              Maisons, parcelles et véhicules vérifiés avant d’être mis en vente. Un agent vous
+              accompagne de la visite jusqu’à la mutation.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link href="/biens" className="btn-or text-lg">
@@ -98,7 +98,7 @@ export default async function Accueil() {
           <div className="relative aspect-[4/3] overflow-hidden rounded-lg ring-1 ring-white/15 lg:aspect-[5/4]">
             <Image
               src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=70"
-              alt="Villa muree avec cour en terre rouge, typique des quartiers residentiels de Kolwezi"
+              alt="Villa murée avec cour en terre rouge à Kolwezi"
               fill
               sizes="(max-width: 1024px) 100vw, 45vw"
               className="object-cover"
@@ -138,9 +138,9 @@ export default async function Accueil() {
         <div className="conteneur">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 id="titre-vedette" className="text-2xl sm:text-3xl">Selection du moment</h2>
+              <h2 id="titre-vedette" className="text-2xl sm:text-3xl">Sélection du moment</h2>
               <p className="mt-2 max-w-lisible text-ardoise/85">
-                Six biens choisis par nos agents cette semaine.
+                Nos biens phares sélectionnés cette semaine.
               </p>
             </div>
             <Link href="/biens" className="btn-contour">
@@ -156,8 +156,8 @@ export default async function Accueil() {
             </div>
           ) : (
             <p className="mt-8 rounded-lg bg-white p-6 text-ardoise/85 ring-1 ring-nuit/5">
-              Aucun bien en vedette pour l instant. Parcourez le catalogue complet ou dites-nous ce
-              que vous cherchez, nous vous previendrons des la prochaine entree.
+              Aucun bien en vedette pour l’instant. Parcourez le catalogue complet ou dites-nous ce
+              que vous cherchez, nous vous préviendrons dès la prochaine entrée.
             </p>
           )}
         </div>
@@ -168,7 +168,7 @@ export default async function Accueil() {
         <div className="conteneur">
           <h2 id="titre-avis" className="text-2xl sm:text-3xl">Ce que disent nos clients</h2>
           <p className="mt-2 max-w-lisible text-ardoise/85">
-            Quatre ventes accompagnees en 2025 et 2026, racontees par les acheteurs et vendeurs eux-memes.
+            Des ventes accompagnées racontées par nos acheteurs et vendeurs eux-mêmes.
           </p>
           <div className="mt-8">
             <Testimonials items={avis} />
@@ -182,12 +182,12 @@ export default async function Accueil() {
           <div className="conteneur">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <h2 id="titre-etudes" className="text-2xl sm:text-3xl">Trois dossiers, du debut a la fin</h2>
+                <h2 id="titre-etudes" className="text-2xl sm:text-3xl">Nos études de cas</h2>
                 <p className="mt-2 max-w-lisible text-ardoise/85">
-                  Ce que donne un accompagnement complet, chiffres et delais a l appui.
+                  Ce que donne un accompagnement complet, chiffres et délais à l’appui.
                 </p>
               </div>
-              <Link href="/etudes-de-cas" className="btn-contour">Toutes les etudes</Link>
+              <Link href="/etudes-de-cas" className="btn-contour">Toutes les études</Link>
             </div>
 
             <ul className="mt-8 grid gap-5 md:grid-cols-3">
@@ -221,7 +221,7 @@ export default async function Accueil() {
       {/* FAQ */}
       <section className="bloc" aria-labelledby="titre-faq">
         <div className="conteneur">
-          <h2 id="titre-faq" className="text-2xl sm:text-3xl">Questions frequentes</h2>
+          <h2 id="titre-faq" className="text-2xl sm:text-3xl">Questions fréquentes</h2>
           <div className="mt-8">
             <FaqAccordion items={faq} />
           </div>
@@ -235,9 +235,9 @@ export default async function Accueil() {
       {/* EQUIPE */}
       <section id="equipe" className="bloc bg-nuit-50" aria-labelledby="titre-equipe">
         <div className="conteneur">
-          <h2 id="titre-equipe" className="text-2xl sm:text-3xl">Les personnes que vous aurez en face</h2>
+          <h2 id="titre-equipe" className="text-2xl sm:text-3xl">Notre équipe à votre service</h2>
           <p className="mt-2 max-w-lisible text-ardoise/85">
-            Trois agents, un bureau sur l avenue Manika. Vous parlez a la meme personne du debut a la fin.
+            Une équipe dédiée et un bureau sur l’avenue Manika. Vous parlez au même interlocuteur du début à la fin.
           </p>
           <div className="mt-8">
             <TeamSection members={equipe} />
