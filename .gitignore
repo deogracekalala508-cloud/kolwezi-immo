@@ -12,3 +12,5 @@ next-env.d.ts
 # Images envoyees depuis l'espace agence (a sauvegarder separement)
 public/uploads/*
 !public/uploads/.gitkeep
+
+.vercel

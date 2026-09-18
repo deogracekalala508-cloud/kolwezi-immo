@@ -336,3 +336,29 @@ export async function basculerPublicationEtude(formData: FormData): Promise<void
   journal.info('Publication d etude modifiee', { agentId: agent.id, ressource: id.data });
   rafraichirEtudes(etude.slug);
 }
+
+/* -------------------- Purge du Contenu de Démonstration -------------------- */
+
+export async function purgerToutesLesDonnees(_formData?: FormData): Promise<void> {
+  const agent = await agentCourant();
+  if (!agent) return;
+
+  try {
+    await prisma.contactMessage.deleteMany();
+    await prisma.caseStudy.deleteMany();
+    await prisma.property.deleteMany();
+    await prisma.testimonial.deleteMany();
+    await prisma.faqItem.deleteMany();
+
+    journal.info('Purge des donnees du site effectuee', { agentId: agent.id });
+  } catch (erreur) {
+    journal.erreur('Echec de la purge des donnees', erreur, { agentId: agent.id });
+  }
+
+  revalidatePath('/');
+  revalidatePath('/biens');
+  revalidatePath('/etudes-de-cas');
+  revalidatePath('/faq');
+  revalidatePath('/admin/dashboard');
+  revalidatePath('/sitemap.xml');
+}

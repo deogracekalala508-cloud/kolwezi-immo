@@ -6,6 +6,7 @@ import { exigerAgent, filtreProprietaire, ROLE_SUPER } from '@/lib/admin';
 import { formatPrice, categories, statuses } from '@/lib/site';
 import type { Category, Status } from '@/lib/validations';
 import { changerStatut, supprimerBien } from '@/app/admin/biens/actions';
+import { purgerToutesLesDonnees } from '@/app/admin/actions';
 import SubmitButton from '@/components/admin/SubmitButton';
 
 export const metadata: Metadata = {
@@ -67,10 +68,22 @@ export default async function Dashboard() {
               : 'Vous voyez et modifiez uniquement les fiches que vous avez creees.'}
           </p>
         </div>
-        <Link href="/admin/biens/nouveau" className="btn-or">
-          <Plus className="h-5 w-5" aria-hidden="true" />
-          Ajouter un bien
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <form action={purgerToutesLesDonnees}>
+            <SubmitButton
+              variante="danger"
+              enCours="Purge en cours..."
+              confirmation="Etes-vous sur de vouloir supprimer TOUT le contenu de demonstration (biens, messages, avis, FAQ, etudes) ? Cette action est irreversible."
+            >
+              <Trash2 className="h-4 w-4" aria-hidden="true" />
+              Purger tout le contenu
+            </SubmitButton>
+          </form>
+          <Link href="/admin/biens/nouveau" className="btn-or">
+            <Plus className="h-5 w-5" aria-hidden="true" />
+            Ajouter un bien
+          </Link>
+        </div>
       </div>
 
       <ul className="mt-8 grid gap-3 sm:grid-cols-3 lg:grid-cols-5">
