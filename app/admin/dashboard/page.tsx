@@ -8,6 +8,7 @@ import type { Category, Status } from '@/lib/validations';
 import { changerStatut, supprimerBien } from '@/app/admin/biens/actions';
 import { purgerToutesLesDonnees } from '@/app/admin/actions';
 import SubmitButton from '@/components/admin/SubmitButton';
+import SupprimerActionForm from '@/components/admin/SupprimerActionForm';
 
 export const metadata: Metadata = {
   title: 'Tableau de bord',
@@ -167,17 +168,13 @@ export default async function Dashboard() {
                             </form>
                           )}
 
-                          <form action={supprimerBien}>
-                            <input type="hidden" name="id" value={b.id} />
-                            <SubmitButton
-                              variante="danger"
-                              enCours="..."
-                              confirmation={`Supprimer definitivement "${b.title}" ? Cette action est irreversible.`}
-                            >
-                              <Trash2 className="h-4 w-4" aria-hidden="true" />
-                              Supprimer
-                            </SubmitButton>
-                          </form>
+                          <SupprimerActionForm
+                            action={supprimerBien}
+                            id={b.id}
+                            confirmation={`Supprimer definitivement "${b.title}" ? Cette action est irreversible.`}
+                          >
+                            <><Trash2 className="h-4 w-4" aria-hidden="true" /> Supprimer</>
+                          </SupprimerActionForm>
                         </div>
                       </td>
                     </tr>

@@ -193,22 +193,26 @@ export async function changerStatut(formData: FormData): Promise<void> {
   rafraichir(id.data);
 }
 
-export async function supprimerBien(formData: FormData): Promise<void> {
+export async function supprimerBien(prevState: { ok?: boolean; erreur?: string }, formData: FormData): Promise<{ ok?: boolean; erreur?: string }> {
   const agent = await agentCourant();
-  if (!agent) return;
+  if (!agent) return { erreur: "Session expirée. Reconnectez-vous pour supprimer ce bien." };
 
   const id = idSchema.safeParse(String(formData.get('id') ?? ''));
-  if (!id.success) return;
-  if (!(await peutModifierBien(agent, id.data))) return;
+  if (!id.success) return { erreur: "Identifiant de bien invalide." };
+  if (!(await peutModifierBien(agent, id.data))) return { erreur: "Vous n'avez pas la permission de supprimer ce bien." };
 
   try {
+    const bien = await prisma.property.findFirst({ where: { id: id.data, ...filtreProprietaire(agent) } });
+    if (!bien) return { erreur: "Bien introuvable." };
+
     await prisma.property.delete({ where: { id: id.data, ...filtreProprietaire(agent) } });
     journal.info('Bien supprime', { agentId: agent.id, ressource: id.data });
+    rafraichir(id.data);
+    return { ok: true };
   } catch (erreur) {
     journal.erreur('Echec de suppression de bien', erreur, { agentId: agent.id });
+    return { erreur: "Impossible de supprimer ce bien. Réessayez." };
   }
-
-  rafraichir(id.data);
 }
 
 /** Lecture d'un bien pour le formulaire d'edition, filtree par proprietaire. */

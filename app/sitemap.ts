@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { site } from '@/lib/site';
 
 export const revalidate = 3600;
+export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const statiquesBase = [

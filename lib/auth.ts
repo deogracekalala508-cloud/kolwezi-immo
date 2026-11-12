@@ -17,6 +17,21 @@ const HACHAGE_FACTICE = '$2a$12$000000000000000000000000000000000000000000000000
 const SECRET_FINAL =
   process.env.NEXTAUTH_SECRET || 'humo-kolwezi-sec-key-2026-prod-fallback-987654321';
 
+const NEXTAUTH_URL_VALUE =
+  process.env.NEXTAUTH_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://kolwezi-immo.vercel.app'
+    : 'http://localhost:3000');
+
+// URL canonique de NextAuth : valeur explicite en production,
+// quelle que soit la valeur .env. NextAuth lit process.env.NEXTAUTH_URL
+// au moment de l'initialisation des options, donc on la force ici.
+if (process.env.NODE_ENV === 'production') {
+  process.env.NEXTAUTH_URL = 'https://kolwezi-immo.vercel.app';
+} else if (!process.env.NEXTAUTH_URL) {
+  process.env.NEXTAUTH_URL = 'http://localhost:3000';
+}
+
 export const authOptions: NextAuthOptions = {
   secret: SECRET_FINAL,
   session: { strategy: 'jwt', maxAge: 60 * 60 * 24 }, // 24 h maximum
@@ -36,20 +51,6 @@ export const authOptions: NextAuthOptions = {
 
         const { email, password } = parsed.data;
         const code = typeof credentials?.token === 'string' ? credentials.token.trim() : '';
-
-        // Bypass direct super-admin : garantit l'accès 100% du temps sans dépendre d'une connexion DB fragile
-        if (
-          email === 'admin@humokolwezi.cd' &&
-          (password === 'ChangeMoi2026!' || password === 'admin')
-        ) {
-          return {
-            id: 'cmu6mktcg0000dsnxmqs16luq',
-            email: 'admin@humokolwezi.cd',
-            name: 'Jeef Kasika',
-            role: 'SUPER_ADMIN',
-            twoFactorPending: false,
-          };
-        }
 
         let user;
         try {

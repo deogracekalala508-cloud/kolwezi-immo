@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { exigerAgent } from '@/lib/admin';
 import { basculerPublicationAvis, supprimerTemoignage } from '@/app/admin/actions';
 import SubmitButton from '@/components/admin/SubmitButton';
+import SupprimerActionForm from '@/components/admin/SupprimerActionForm';
 import TemoignageForm from '@/components/admin/TemoignageForm';
 
 export const metadata: Metadata = {
@@ -71,13 +72,13 @@ export default async function AdminTemoignages() {
                   </SubmitButton>
                 </form>
 
-                <form action={supprimerTemoignage}>
-                  <input type="hidden" name="id" value={a.id} />
-                  <SubmitButton variante="danger" enCours="..." confirmation="Supprimer cet avis ?">
-                    <Trash2 className="h-4 w-4" aria-hidden="true" />
-                    Supprimer
-                  </SubmitButton>
-                </form>
+                <SupprimerActionForm
+                  action={supprimerTemoignage}
+                  id={a.id}
+                  confirmation="Supprimer cet avis ?"
+                >
+                  <><Trash2 className="h-4 w-4" aria-hidden="true" /> Supprimer</>
+                </SupprimerActionForm>
               </div>
             </li>
           ))}

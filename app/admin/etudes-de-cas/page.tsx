@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma';
 import { exigerAgent, filtreProprietaire } from '@/lib/admin';
 import { supprimerEtude, basculerPublicationEtude } from '@/app/admin/actions';
 import SubmitButton from '@/components/admin/SubmitButton';
+import SupprimerActionForm from '@/components/admin/SupprimerActionForm';
 import EtudeForm from '@/components/admin/EtudeForm';
 
 export const metadata: Metadata = {
@@ -90,24 +91,24 @@ export default async function AdminEtudes() {
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <form action={basculerPublicationEtude}>
-                    <input type="hidden" name="id" value={e.id} />
-                    <SubmitButton variante="contour" enCours="...">
-                      {e.published ? (
-                        <><EyeOff className="h-4 w-4" aria-hidden="true" /> Masquer</>
-                      ) : (
-                        <><Eye className="h-4 w-4" aria-hidden="true" /> Publier</>
-                      )}
-                    </SubmitButton>
-                  </form>
+                 <form action={basculerPublicationEtude}>
+                   <input type="hidden" name="id" value={e.id} />
+                   <SubmitButton variante="contour" enCours="...">
+                     {e.published ? (
+                       <><EyeOff className="h-4 w-4" aria-hidden="true" /> Masquer</>
+                     ) : (
+                       <><Eye className="h-4 w-4" aria-hidden="true" /> Publier</>
+                     )}
+                   </SubmitButton>
+                 </form>
 
-                  <form action={supprimerEtude}>
-                    <input type="hidden" name="id" value={e.id} />
-                    <SubmitButton variante="danger" enCours="..." confirmation="Supprimer cette etude de cas ?">
-                      <Trash2 className="h-4 w-4" aria-hidden="true" />
-                      Supprimer
-                    </SubmitButton>
-                  </form>
+                 <SupprimerActionForm
+                   action={supprimerEtude}
+                   id={e.id}
+                   confirmation="Supprimer cette etude de cas ?"
+                 >
+                   <><Trash2 className="h-4 w-4" aria-hidden="true" /> Supprimer</>
+                 </SupprimerActionForm>
                 </div>
               </div>
             </details>

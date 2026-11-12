@@ -14,23 +14,37 @@
 
   body {
     @apply bg-sable text-ardoise antialiased;
-    font-size: 17px; /* lisible sur petits ecrans bon marche */
-    line-height: 1.6;
+    font-size: 17px;
+    line-height: 1.65;
   }
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     @apply font-display font-semibold tracking-tight text-nuit;
     line-height: 1.15;
     text-wrap: balance;
   }
 
-  /* Focus clavier toujours visible, y compris sur fond sombre */
+  /* Focus clavier visible et élégant */
   :focus-visible {
     outline: 3px solid theme('colors.or.DEFAULT');
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: 3px;
+    box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.15);
+  }
+
+  ::selection {
+    background-color: theme('colors.or.DEFAULT');
+    color: theme('colors.nuit.DEFAULT');
+  }
+
+  /* Anti-aliasing subtil pour le texte */
+  * {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -48,7 +62,7 @@
 
 @layer components {
   .conteneur {
-    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
   }
 
   .bloc {
@@ -60,36 +74,456 @@
       focus:rounded focus:bg-or focus:px-4 focus:py-2 focus:font-semibold focus:text-nuit;
   }
 
+  /* Boutons humanisés : plus de profondeur, meilleurs états */
   .btn-or {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-or px-5 py-3
-      font-semibold text-nuit transition-colors hover:bg-or-300 active:bg-or-300;
+    @apply inline-flex items-center justify-center gap-2.5 rounded-lg bg-or text-nuit font-semibold
+      px-5 py-3 shadow-carte transition-all duration-200 ease-out
+      hover:bg-or-400 hover:shadow-carteEleve hover:-translate-y-0.5
+      active:bg-or-500 active:shadow-discret active:translate-y-0;
+  }
+
+  .btn-or.is-disabled,
+  .btn-or:disabled {
+    @apply opacity-60 cursor-not-allowed pointer-events-none;
+    transform: none;
   }
 
   .btn-nuit {
-    @apply inline-flex items-center justify-center gap-2 rounded-md bg-nuit px-5 py-3
-      font-semibold text-white transition-colors hover:bg-nuit-700;
+    @apply inline-flex items-center justify-center gap-2.5 rounded-lg bg-nuit text-white font-semibold
+      px-5 py-3 shadow-carte transition-all duration-200 ease-out
+      hover:bg-nuit-700 hover:shadow-carteEleve hover:-translate-y-0.5
+      active:bg-nuit-800 active:shadow-discret active:translate-y-0;
   }
 
   .btn-contour {
-    @apply inline-flex items-center justify-center gap-2 rounded-md border border-nuit/25
-      bg-white px-5 py-3 font-semibold text-nuit transition-colors hover:border-nuit/50;
+    @apply inline-flex items-center justify-center gap-2.5 rounded-lg border-2 border-nuit/30 bg-white
+      px-5 py-3 font-semibold text-nuit transition-all duration-200 ease-out
+      hover:border-nuit/70 hover:bg-sable-50 hover:shadow-carteEleve hover:-translate-y-0.5
+      active:border-nuit active:shadow-discret active:translate-y-0;
   }
 
+  .btn-contour.danger {
+    @apply border-red-300 text-red-700 bg-white hover:bg-red-50 hover:border-red-500;
+  }
+
+  .btn-destructif {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border-2 border-red-300 bg-white
+      px-4 py-2 font-semibold text-red-700 transition-all duration-200 ease-out
+      hover:bg-red-50 hover:border-red-500 hover:shadow-carteEleve hover:-translate-y-0.5
+      active:bg-red-100 active:shadow-discret active:translate-y-0;
+  }
+
+  /* Inputs humanisés : plus de profondeur, focus plus visible */
   .champ {
-    @apply w-full rounded-md border border-nuit/20 bg-white px-3 py-3 text-base
-      text-ardoise placeholder:text-ardoise/40 focus:border-nuit-600;
+    @apply w-full rounded-lg border-2 border-nuit/20 bg-white px-4 py-3.5 text-base text-ardoise
+      placeholder:text-menin transition-all duration-200 ease-out
+      focus:border-cuivre focus:ring-0 focus:shadow-[0_0_0_3px_rgba(184,115,51,0.15)]
+      hover:border-nuit/35;
   }
 
+  .champ.is-invalid {
+    @apply border-red-400 focus:border-red-500 focus:ring-[0_0_0_3px_rgba(197,48,48,0.15)];
+  }
+
+  .champ.large {
+    @apply py-4 px-4 text-lg;
+  }
+
+  .champ.small {
+    @apply py-2 px-3 text-sm;
+  }
+
+  /* Labels : plus présents */
   .etiquette {
-    @apply mb-1.5 block font-medium text-nuit;
+    @apply mb-2 block font-semibold text-nuit text-sm tracking-wide;
   }
 
+  .etiquette.slim {
+    @apply mb-1;
+  }
+
+  /* Messages d'erreur : plus lisibles */
   .erreur {
-    @apply mt-1.5 text-sm font-medium text-red-700;
+    @apply mt-2 text-sm font-medium text-red-700 flex items-start gap-2;
   }
 
-  /* Filet cuivre : rappel du minerai, utilise pour separer les grandes sections */
+  .erreur::before {
+    content: '⚠';
+    @apply text-red-500 mr-1;
+  }
+
+  /* Succès : positif et visuel */
+  .succes {
+    @apply mt-2 text-sm font-medium text-vert-600 flex items-start gap-2;
+  }
+
+  .succes::before {
+    content: '✓';
+    @apply text-vert-600 mr-1 flex-shrink-0;
+  }
+
+  /* Alertes enrichies */
+  .alerte {
+    @apply rounded-xl p-4 transition-all duration-300;
+  }
+
+  .alerte.erreur {
+    @apply bg-red-50 border-2 border-red-200 text-red-800;
+  }
+
+  .alerte.succes {
+    @apply bg-vert-50 border-2 border-vert-200 text-vert-600;
+  }
+
+  .alerte.avertissement {
+    @apply bg-or-50 border-2 border-or-200 text-or-700;
+  }
+
+  .alerte.info {
+    @apply bg-nuit-50 border-2 border-nuit-200 text-nuit-700;
+  }
+
+  /* Cartes enrichies : plus de profondeur */
+  .carte {
+    @apply rounded-xl bg-white shadow-carte ring-1 ring-nuit/5 transition-all duration-300;
+  }
+
+  .carte.hoverable {
+    @apply hover:shadow-carteEleve hover:-translate-y-1 cursor-pointer;
+  }
+
+  .carte.avec-badge {
+    @apply relative overflow-hidden;
+  }
+
+  .carte.avec-badge::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-or/10 to-transparent pointer-events-none;
+  }
+
+  /* Badges humanisés */
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold tracking-wide;
+    @apply transition-all duration-200;
+  }
+
+  .badge.nuit {
+    @apply bg-nuit-500 text-white shadow-sm;
+  }
+
+  .badge.or {
+    @apply bg-or-500 text-nuit shadow-sm;
+  }
+
+  .badge.cuivre {
+    @apply bg-cuivre-500 text-white shadow-sm;
+  }
+
+  .badge.sable {
+    @apply bg-sable-300 text-ardoise;
+  }
+
+  .badge.vert {
+    @apply bg-vert-500 text-white shadow-sm;
+  }
+
+  .badge.gray {
+    @apply bg-ardoise-200 text-ardoise-700;
+  }
+
+  .badge.snow {
+    @apply bg-white text-ardoise border-2 border-nuit/20 shadow-sm;
+  }
+
+  /* Sections : plus de respirations */
+  .section-titre {
+    @apply text-3xl sm:text-4xl lg:text-5xl font-bold text-nuit tracking-tight;
+  }
+
+  .section-sous-titre {
+    @apply mt-3 max-w-2xl text-lg text-ardoise/80;
+  }
+
+  /* Filet cuivre : plus subtil */
   .filet-cuivre {
-    @apply h-px w-full bg-gradient-to-r from-cuivre/0 via-cuivre/60 to-cuivre/0;
+    @apply h-px w-full bg-gradient-to-r from-cuivre/0 via-cuivre/50 to-cuivre/0;
+  }
+
+  /* Navigation mobile : plus goûtante */
+  .nav-mobile-toggle {
+    @apply relative w-10 h-10 flex items-center justify-center rounded-lg
+      bg-white border border-nuit/20 shadow-discret transition-all duration-200;
+  }
+
+  /* Navigation desktop : élégante */
+  .nav-item {
+    @apply relative px-4 py-2 font-medium text-ardoise/70 hover:text-nuit transition-colors duration-200;
+  }
+
+  .nav-item.active {
+    @apply text-nuit;
+  }
+
+  .nav-item.active::after {
+    content: '';
+    @apply absolute bottom-0 left-0 right-0 h-0.5 bg-or;
+  }
+
+  /* Footer : plus structuré */
+  .footer {
+    @apply bg-nuit-900 text-white/80;
+  }
+
+  .footer-section {
+    @apply mb-10;
+  }
+
+  .footer-titre {
+    @apply font-display text-lg font-semibold text-white mb-4;
+  }
+
+  .footer-link {
+    @apply block text-sm text-white/70 hover:text-white transition-colors duration-200;
+  }
+
+  /* Table des statistiques : plus vivante */
+  .stat-card {
+    @apply rounded-xl bg-white p-5 shadow-carte ring-1 ring-nuit/5 transition-all duration-300;
+  }
+
+  .stat-card.hoverable {
+    @apply hover:shadow-carteEleve hover:-translate-y-1;
+  }
+
+  .stat-valeur {
+    @apply text-3xl sm:text-4xl font-bold text-nuit tracking-tight;
+  }
+
+  .stat-label {
+    @apply mt-1 text-sm text-ardoise/70 font-medium;
+  }
+
+  .stat-lien {
+    @apply mt-2 block text-sm font-semibold text-or hover:text-or-600;
+  }
+
+  /* Table des biens : plus structurée */
+  .table-header {
+    @apply bg-nuit-50 text-nuit border-b border-nuit/10;
+  }
+
+  .table-row {
+    @apply border-b border-nuit/5 hover:bg-sable-50 transition-colors duration-150;
+  }
+
+  /* Icônes : plus cohérentes */
+  .icone-service {
+    @apply h-9 w-9 rounded-full bg-cuivre-100 text-cuivre flex items-center justify-center;
+  }
+
+  /* Avatars : plus humains */
+  .avatar {
+    @apply rounded-full bg-cuivre-200 text-cuivre-700 font-semibold flex items-center justify-center;
+    @apply overflow-hidden;
+  }
+
+  .avatar.small {
+    @apply h-8 w-8 text-xs;
+  }
+
+  .avatar.medium {
+    @apply h-10 w-10 text-sm;
+  }
+
+  .avatar.large {
+    @apply h-12 w-12 text-base;
+  }
+
+  /* Skeleton loader : plus doux */
+  .skeleton {
+    @apply bg-sable-200 rounded animate-pulse;
+  }
+
+  .skeleton.text {
+    @apply h-4 w-full;
+  }
+
+  .skeleton.titre {
+    @apply h-8 w-3/4;
+  }
+
+  .skeleton.image {
+    @apply aspect-square rounded-xl;
+  }
+
+  /* Transitions subtiles pour les éléments */
+  .transition-element {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  .hover-area {
+    @apply hover:shadow-carteEleve hover:-translate-y-1;
+  }
+
+  /* Page de connexion admin : plus chaleureuse */
+  .login-container {
+    @apply min-h-[75vh] flex items-center justify-center py-16;
+  }
+
+  .login-card {
+    @apply w-full max-w-sm rounded-2xl bg-white p-8 shadow-carteEleve ring-1 ring-nuit/5;
+  }
+
+  .login-titre {
+    @apply text-2xl font-bold text-nuit;
+  }
+
+  .login-sous-titre {
+    @apply mt-1 text-sm text-ardoise/70;
+  }
+
+  /* Sidebar admin : moderne et spacieuse */
+  .sidebar {
+    @apply bg-sable-100 border-r border-nuit/10;
+  }
+
+  .sidebar-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-ardoise-700 hover:bg-white hover:text-nuit
+      transition-all duration-200 font-medium;
+  }
+
+  .sidebar-item.active {
+    @apply bg-white text-nuit shadow-discret;
+  }
+
+  .sidebar-item.active::before {
+    content: '';
+    @apply absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-or rounded-r;
+  }
+
+  /* Dashboard : aéré et professionnel */
+  .dashboard-header {
+    @apply flex flex-wrap items-end justify-between gap-4 py-6;
+  }
+
+  .dashboard-greeting {
+    @apply text-3xl font-bold text-nuit;
+  }
+
+  .dashboard-sous-titre {
+    @apply mt-1 text-ardoise/80;
+  }
+
+  /* Table admin : professionnelle */
+  .admin-table {
+    @apply w-full text-left text-sm;
+  }
+
+  .admin-table th {
+    @apply px-4 py-3 font-semibold text-nuit/70;
+  }
+
+  .admin-table td {
+    @apply px-4 py-3;
+  }
+
+  /* Bouton supprimer admin : clair et sécurisant */
+  .btn-supprimer {
+    @apply btn-destructif;
+  }
+
+  .btn-supprimer:disabled {
+    @apply opacity-60 cursor-not-allowed;
+  }
+}
+
+@layer utilities {
+  /* Utilitaire pour les transitions automatiques */
+  .transition-default {
+    @apply transition-all duration-200 ease-out;
+  }
+
+  /* Espacement entre les éléments d'une grille */
+  .gap-harmonique {
+    @apply gap-6;
+  }
+
+  /* Plus de respirations dans les contenus */
+  .mt-harmonique {
+    @apply mt-8;
+  }
+
+  .mb-harmonique {
+    @apply mb-8;
+  }
+
+  .py-harmonique {
+    @apply py-12;
+  }
+
+  /* Effet de relief subtil */
+  .relief {
+    @apply rounded-xl bg-white shadow-carte ring-1 ring-nuit/5;
+  }
+
+  /* Gradient subtile pour les sections */
+  .fond-gradient {
+    @apply bg-gradient-to-br from-sable via-sable-100 to-sable-200;
+  }
+
+  /* Texte dégradé pour les titres hero */
+  .texte-degrade {
+    @apply bg-gradient-to-r from-or via-or-400 to-cuivre-500 bg-clip-text text-transparent;
+  }
+
+  /* Aspect ratio pour les images */
+  .aspect-image {
+    aspect-ratio: 4 / 3;
+  }
+
+  .aspect-large {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Boutons ghost pour les actions secondaires */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 font-semibold
+      text-ardoise-600 hover:text-nuit transition-colors duration-200;
+  }
+
+  /* Icônes de statut */
+  .statut-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .statut-badge.disponible {
+    @apply bg-vert-100 text-vert-600;
+  }
+
+  .statut-badge.reserve {
+    @apply bg-or-100 text-or-700;
+  }
+
+  .statut-badge.vendu {
+    @apply bg-sable-200 text-sable-500;
+  }
+
+  .statut-badge.inconnu {
+    @apply bg-ardoise-200 text-ardoise-600;
+  }
+
+  /* Hauteur de ligne améliorée pour la lisibilité */
+  .text-resume {
+    @apply leading-relaxed;
+  }
+
+  .text-court {
+    @apply leading-snug;
+  }
+
+  /* Indicateur de포커스 clavier */
+  .sr-only-focusable {
+    @apply sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50
+      focus:rounded focus:bg-or focus:px-4 focus:py-2 focus:font-semibold focus:text-nuit;
   }
 }

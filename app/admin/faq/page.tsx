@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { exigerAgent } from '@/lib/admin';
 import { supprimerFaq } from '@/app/admin/actions';
 import SubmitButton from '@/components/admin/SubmitButton';
+import SupprimerActionForm from '@/components/admin/SupprimerActionForm';
 import FaqForm from '@/components/admin/FaqForm';
 
 export const metadata: Metadata = {
@@ -21,8 +22,8 @@ export default async function AdminFaq() {
     <div className="conteneur py-10">
       <h1 className="text-3xl">Questions frequentes</h1>
       <p className="mt-2 max-w-lisible text-ardoise/85">
-        Ces questions alimentent la page FAQ, le bloc de la page d accueil et le balisage
-        Schema.org lu par Google. L ordre le plus petit s affiche en premier.
+        Ces questions alimentent la page FAQ, le bloc de la page d&apos;accueil et le balisage
+        Schema.org lu par Google. L&apos;ordre le plus petit s&apos;affiche en premier.
       </p>
 
       <div className="mt-8 rounded-lg bg-white p-6 shadow-carte ring-1 ring-nuit/5">
@@ -49,13 +50,13 @@ export default async function AdminFaq() {
               <div className="mt-4 max-w-2xl border-t border-nuit/10 pt-4">
                 <FaqForm valeurs={{ id: item.id, question: item.question, answer: item.answer, order: item.order }} />
 
-                <form action={supprimerFaq} className="mt-4">
-                  <input type="hidden" name="id" value={item.id} />
-                  <SubmitButton variante="danger" enCours="..." confirmation="Supprimer cette question ?">
-                    <Trash2 className="h-4 w-4" aria-hidden="true" />
-                    Supprimer
-                  </SubmitButton>
-                </form>
+                <SupprimerActionForm
+                  action={supprimerFaq}
+                  id={item.id}
+                  confirmation="Supprimer cette question ?"
+                >
+                  <><Trash2 className="h-4 w-4" aria-hidden="true" /> Supprimer</>
+                </SupprimerActionForm>
               </div>
             </details>
           </li>

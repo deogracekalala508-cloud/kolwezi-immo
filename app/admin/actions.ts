@@ -44,21 +44,26 @@ export async function basculerLecture(formData: FormData): Promise<void> {
   revalidatePath('/admin/dashboard');
 }
 
-export async function supprimerMessage(formData: FormData): Promise<void> {
+export async function supprimerMessage(prevState: { ok?: boolean; erreur?: string }, formData: FormData): Promise<{ ok?: boolean; erreur?: string }> {
   const agent = await agentCourant();
-  if (!agent) return;
+  if (!agent) return { erreur: "Session expirée. Reconnectez-vous pour supprimer ce message." };
 
   const id = idSchema.safeParse(String(formData.get('id') ?? ''));
-  if (!id.success) return;
+  if (!id.success) return { erreur: "Identifiant de message invalide." };
 
   try {
+    const message = await prisma.contactMessage.findUnique({ where: { id: id.data } });
+    if (!message) return { erreur: "Message introuvable." };
+
     await prisma.contactMessage.delete({ where: { id: id.data } });
     journal.info('Message supprime', { agentId: agent.id, ressource: id.data });
+    revalidatePath('/admin/messages');
+    revalidatePath('/admin/dashboard');
+    return { ok: true };
   } catch (erreur) {
     journal.erreur('Echec de suppression de message', erreur, { agentId: agent.id });
+    return { erreur: "Impossible de supprimer ce message. Réessayez." };
   }
-  revalidatePath('/admin/messages');
-  revalidatePath('/admin/dashboard');
 }
 
 /* ---------------------------- Temoignages ---------------------------- */
@@ -114,20 +119,25 @@ export async function basculerPublicationAvis(formData: FormData): Promise<void>
   revalidatePath('/');
 }
 
-export async function supprimerTemoignage(formData: FormData): Promise<void> {
+export async function supprimerTemoignage(prevState: { ok?: boolean; erreur?: string }, formData: FormData): Promise<{ ok?: boolean; erreur?: string }> {
   const agent = await agentCourant();
-  if (!agent) return;
+  if (!agent) return { erreur: "Session expirée. Reconnectez-vous pour supprimer cet avis." };
   const id = idSchema.safeParse(String(formData.get('id') ?? ''));
-  if (!id.success) return;
+  if (!id.success) return { erreur: "Identifiant d'avis invalide." };
 
   try {
+    const avis = await prisma.testimonial.findUnique({ where: { id: id.data } });
+    if (!avis) return { erreur: "Avis introuvable." };
+
     await prisma.testimonial.delete({ where: { id: id.data } });
     journal.info('Avis supprime', { agentId: agent.id, ressource: id.data });
+    revalidatePath('/admin/temoignages');
+    revalidatePath('/');
+    return { ok: true };
   } catch (erreur) {
     journal.erreur('Echec de suppression d avis', erreur, { agentId: agent.id });
+    return { erreur: "Impossible de supprimer cet avis. Réessayez." };
   }
-  revalidatePath('/admin/temoignages');
-  revalidatePath('/');
 }
 
 /* -------------------------------- FAQ -------------------------------- */
@@ -188,20 +198,25 @@ export async function modifierFaq(_precedent: EtatAction, formData: FormData): P
   return { ok: true };
 }
 
-export async function supprimerFaq(formData: FormData): Promise<void> {
+export async function supprimerFaq(prevState: { ok?: boolean; erreur?: string }, formData: FormData): Promise<{ ok?: boolean; erreur?: string }> {
   const agent = await agentCourant();
-  if (!agent) return;
+  if (!agent) return { erreur: "Session expirée. Reconnectez-vous pour supprimer cette question." };
   const id = idSchema.safeParse(String(formData.get('id') ?? ''));
-  if (!id.success) return;
+  if (!id.success) return { erreur: "Identifiant de question invalide." };
 
   try {
+    const faq = await prisma.faqItem.findUnique({ where: { id: id.data } });
+    if (!faq) return { erreur: "Question introuvable." };
+
     await prisma.faqItem.delete({ where: { id: id.data } });
     journal.info('Question FAQ supprimee', { agentId: agent.id, ressource: id.data });
+    revalidatePath('/admin/faq');
+    revalidatePath('/faq');
+    return { ok: true };
   } catch (erreur) {
     journal.erreur('Echec de suppression FAQ', erreur, { agentId: agent.id });
+    return { erreur: "Impossible de supprimer cette question. Réessayez." };
   }
-  revalidatePath('/admin/faq');
-  revalidatePath('/faq');
 }
 
 /* ---------------------------- Etudes de cas ---------------------------- */
@@ -298,21 +313,26 @@ export async function enregistrerEtude(
   return { ok: true };
 }
 
-export async function supprimerEtude(formData: FormData): Promise<void> {
+export async function supprimerEtude(prevState: { ok?: boolean; erreur?: string }, formData: FormData): Promise<{ ok?: boolean; erreur?: string }> {
   const agent = await agentCourant();
-  if (!agent) return;
+  if (!agent) return { erreur: "Session expirée. Reconnectez-vous pour supprimer cette étude." };
 
   const id = idSchema.safeParse(String(formData.get('id') ?? ''));
-  if (!id.success) return;
-  if (!(await peutModifierEtude(agent, id.data))) return;
+  if (!id.success) return { erreur: "Identifiant d'étude invalide." };
+  if (!(await peutModifierEtude(agent, id.data))) return { erreur: "Vous n'avez pas la permission de supprimer cette étude." };
 
   try {
+    const etude = await prisma.caseStudy.findUnique({ where: { id: id.data, ...filtreProprietaire(agent) } });
+    if (!etude) return { erreur: "Étude introuvable." };
+
     await prisma.caseStudy.delete({ where: { id: id.data, ...filtreProprietaire(agent) } });
     journal.info('Etude de cas supprimee', { agentId: agent.id, ressource: id.data });
+    rafraichirEtudes();
+    return { ok: true };
   } catch (erreur) {
     journal.erreur('Echec de suppression d etude de cas', erreur, { agentId: agent.id });
+    return { erreur: "Impossible de supprimer cette étude. Réessayez." };
   }
-  rafraichirEtudes();
 }
 
 export async function basculerPublicationEtude(formData: FormData): Promise<void> {
